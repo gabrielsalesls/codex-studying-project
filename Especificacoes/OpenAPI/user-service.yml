@@ -1,0 +1,104 @@
+openapi: 3.0.3
+info:
+  title: User Service API
+  description: Serviço responsável pelo gerenciamento de usuários
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8081
+
+paths:
+
+  /users:
+    post:
+      summary: Criar usuário
+      operationId: createUser
+      tags: [User]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '201':
+          description: Usuário criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '409':
+          description: CPF ou email já cadastrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/{id}:
+    get:
+      summary: Buscar usuário por ID
+      operationId: getUserById
+      tags: [User]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Usuário encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: Usuário não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+
+    UserRequest:
+      type: object
+      required: [name, cpf, email, password, type]
+      properties:
+        name:
+          type: string
+        cpf:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        type:
+          type: string
+          enum: [COMMON, MERCHANT]
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string

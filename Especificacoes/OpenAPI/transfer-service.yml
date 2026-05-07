@@ -1,0 +1,88 @@
+openapi: 3.0.3
+info:
+  title: Transfer Service API
+  description: Serviço responsável pela orquestração de transferências
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8083
+
+paths:
+
+  /transfer:
+    post:
+      summary: Realizar transferência
+      operationId: createTransfer
+      tags: [Transfer]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+      responses:
+        '200':
+          description: Transferência realizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferResponse'
+        '400':
+          description: Regra de negócio inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Não autorizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+
+    TransferRequest:
+      type: object
+      required: [value, payer, payee]
+      properties:
+        value:
+          type: number
+          format: double
+        payer:
+          type: integer
+        payee:
+          type: integer
+
+    TransferResponse:
+      type: object
+      properties:
+        transactionId:
+          type: string
+        status:
+          type: string
+          enum: [SUCCESS, FAILED, COMPENSATED]
+        amount:
+          type: number
+        payer:
+          type: integer
+        payee:
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string

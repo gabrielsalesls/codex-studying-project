@@ -1,0 +1,86 @@
+openapi: 3.0.3
+info:
+  title: BFF API
+  description: Backend for Frontend responsável por agregação
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+
+  /users/{id}/summary:
+    get:
+      summary: Retorna dados agregados do usuário
+      operationId: getUserSummary
+      tags: [BFF]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Dados agregados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSummary'
+
+  /transfer:
+    post:
+      summary: Encaminha transferência
+      operationId: proxyTransfer
+      tags: [BFF]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+      responses:
+        '200':
+          description: Transferência processada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferResponse'
+
+components:
+  schemas:
+
+    UserSummary:
+      type: object
+      properties:
+        userId:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+        balance:
+          type: number
+
+    TransferRequest:
+      type: object
+      properties:
+        value:
+          type: number
+        payer:
+          type: integer
+        payee:
+          type: integer
+
+    TransferResponse:
+      type: object
+      properties:
+        transactionId:
+          type: string
+        status:
+          type: string
+        amount:
+          type: number
+        payer:
+          type: integer
+        payee:
+          type: integer

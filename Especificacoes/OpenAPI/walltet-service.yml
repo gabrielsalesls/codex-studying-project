@@ -1,0 +1,201 @@
+openapi: 3.0.3
+info:
+  title: Wallet Service API
+  description: Serviço responsável pelo gerenciamento de carteiras e saldo dos usuários
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8082
+
+paths:
+
+  /wallet:
+    post:
+      summary: Criar carteira
+      description: Cria uma carteira para um usuário com saldo inicial zero
+      operationId: createWallet
+      tags: [Wallet]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWalletRequest'
+      responses:
+        '201':
+          description: Carteira criada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletCreatedResponse'
+        '400':
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Carteira já existe para o usuário
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /wallet/{userId}:
+    get:
+      summary: Consultar saldo
+      description: Retorna o saldo da carteira do usuário
+      operationId: getBalance
+      tags: [Wallet]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Saldo encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletResponse'
+        '404':
+          description: Carteira não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /wallet/debit:
+    post:
+      summary: Debitar saldo
+      description: Debita um valor da carteira do usuário
+      operationId: debitBalance
+      tags: [Wallet]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        '200':
+          description: Débito realizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletResponse'
+        '400':
+          description: Saldo insuficiente ou valor inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Carteira não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /wallet/credit:
+    post:
+      summary: Creditar saldo
+      description: Credita um valor na carteira do usuário
+      operationId: creditBalance
+      tags: [Wallet]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        '200':
+          description: Crédito realizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletResponse'
+        '400':
+          description: Valor inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Carteira não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+
+    CreateWalletRequest:
+      type: object
+      required:
+        - userId
+        - userType
+      properties:
+        userId:
+          type: integer
+          example: 1
+        userType:
+          type: string
+          enum: [COMMON, MERCHANT]
+          example: COMMON
+
+    WalletCreatedResponse:
+      type: object
+      properties:
+        walletId:
+          type: string
+          example: "wallet-123"
+        userId:
+          type: integer
+          example: 1
+        balance:
+          type: number
+          format: double
+          example: 0.0
+
+    WalletResponse:
+      type: object
+      properties:
+        userId:
+          type: integer
+        balance:
+          type: number
+          format: double
+
+    TransactionRequest:
+      type: object
+      required:
+        - userId
+        - amount
+      properties:
+        userId:
+          type: integer
+          example: 1
+        amount:
+          type: number
+          format: double
+          example: 100.0
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
