@@ -22,7 +22,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserResponse> create(@Valid @RequestBody UserRequest request) {
+    public ResponseEntity<CreateUserResponse> create(@Valid @RequestBody UserRequest request) {
         var response = userService.create(request);
         return ResponseEntity.created(URI.create("/api/v1/users/%s".formatted(response.id()))).body(response);
     }

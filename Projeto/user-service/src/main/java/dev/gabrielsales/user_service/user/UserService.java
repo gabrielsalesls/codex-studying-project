@@ -2,8 +2,10 @@ package dev.gabrielsales.user_service.user;
 
 import dev.gabrielsales.user_service.common.exception.ResourceConflictException;
 import dev.gabrielsales.user_service.common.exception.ResourceNotFoundException;
+import dev.gabrielsales.user_service.user.api.CreateUserResponse;
 import dev.gabrielsales.user_service.user.api.UserRequest;
 import dev.gabrielsales.user_service.user.api.UserResponse;
+import dev.gabrielsales.user_service.user.api.WalletResponse;
 import dev.gabrielsales.user_service.wallet.WalletClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +22,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse create(UserRequest request) {
+    public CreateUserResponse create(UserRequest request) {
         validateUniqueness(request);
 
         var user = new User(
@@ -32,8 +34,13 @@ public class UserService {
         );
 
         var savedUser = userRepository.save(user);
-        walletClient.createWallet(savedUser.getId(), savedUser.getType());
-        return toResponse(savedUser);
+        var wallet = walletClient.createWallet(savedUser.getId(), savedUser.getType());
+        return new CreateUserResponse(
+                savedUser.getId(),
+                savedUser.getName(),
+                savedUser.getType(),
+                new WalletResponse(wallet.walletId())
+        );
     }
 
     @Transactional(readOnly = true)

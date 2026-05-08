@@ -20,13 +20,13 @@ public class WalletClient {
                 .build();
     }
 
-    public void createWallet(Long userId, UserType userType) {
+    public WalletCreatedResponse createWallet(Long userId, UserType userType) {
         try {
-            restClient.post()
+            return restClient.post()
                     .uri("/wallet")
                     .body(new CreateWalletRequest(userId, userType))
                     .retrieve()
-                    .toBodilessEntity();
+                    .body(WalletCreatedResponse.class);
         } catch (RestClientException exception) {
             throw new DownstreamServiceException(
                     "Failed to create wallet for user with id %s".formatted(userId),

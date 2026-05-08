@@ -3,6 +3,7 @@ package dev.gabrielsales.user_service.user.api;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -107,6 +108,7 @@ class UserControllerIntegrationTest {
         assertEquals(createdId, body.get("id").asLong());
         assertEquals("Maria", body.get("name").asText());
         assertEquals("COMMON", body.get("type").asText());
+        assertEquals("wallet-123", body.get("wallet").get("id").asText());
 
         var walletRequest = objectMapper.readTree(walletCreateRequestBody.get());
         assertEquals(createdId, walletRequest.get("userId").asLong());
@@ -172,6 +174,7 @@ class UserControllerIntegrationTest {
         assertEquals(createdId, body.get("id").asLong());
         assertEquals("Maria", body.get("name").asText());
         assertEquals("COMMON", body.get("type").asText());
+        assertNull(body.get("wallet"));
     }
 
     @Test
