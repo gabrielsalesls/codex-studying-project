@@ -1,9 +1,7 @@
-package dev.gabrielsales.user_service.common.web;
+package dev.gabrielsales.wallet_service.common.web;
 
-import dev.gabrielsales.user_service.common.exception.DownstreamServiceException;
-import dev.gabrielsales.user_service.common.api.ApiErrorResponse;
-import dev.gabrielsales.user_service.common.exception.ResourceConflictException;
-import dev.gabrielsales.user_service.common.exception.ResourceNotFoundException;
+import dev.gabrielsales.wallet_service.common.api.ApiErrorResponse;
+import dev.gabrielsales.wallet_service.common.exception.ResourceConflictException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.time.OffsetDateTime;
@@ -18,28 +16,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiErrorResponse> handleNotFound(
-            ResourceNotFoundException exception,
-            HttpServletRequest request
-    ) {
-        return buildResponse(HttpStatus.NOT_FOUND, exception.getMessage(), request.getRequestURI());
-    }
-
     @ExceptionHandler(ResourceConflictException.class)
     public ResponseEntity<ApiErrorResponse> handleConflict(
             ResourceConflictException exception,
             HttpServletRequest request
     ) {
         return buildResponse(HttpStatus.CONFLICT, exception.getMessage(), request.getRequestURI());
-    }
-
-    @ExceptionHandler(DownstreamServiceException.class)
-    public ResponseEntity<ApiErrorResponse> handleDownstreamFailure(
-            DownstreamServiceException exception,
-            HttpServletRequest request
-    ) {
-        return buildResponse(HttpStatus.BAD_GATEWAY, exception.getMessage(), request.getRequestURI());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
