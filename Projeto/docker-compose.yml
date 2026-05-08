@@ -1,0 +1,20 @@
+services:
+  wallet-service:
+    build:
+      context: ./wallet-service
+      dockerfile: Dockerfile
+    container_name: wallet-service
+    ports:
+      - "8082:8082"
+
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    depends_on:
+      - wallet-service
+    environment:
+      WALLET_SERVICE_BASE_URL: http://wallet-service:8082
+    ports:
+      - "8081:8081"
