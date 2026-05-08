@@ -1,4 +1,18 @@
 services:
+  bff-service:
+    build:
+      context: ./bff-service
+      dockerfile: Dockerfile
+    container_name: bff-service
+    depends_on:
+      - user-service
+      - wallet-service
+    environment:
+      USER_SERVICE_BASE_URL: http://user-service:8081
+      WALLET_SERVICE_BASE_URL: http://wallet-service:8082
+    ports:
+      - "8080:8080"
+
   wallet-service:
     build:
       context: ./wallet-service
