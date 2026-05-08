@@ -18,6 +18,8 @@ import org.springframework.http.MediaType;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class UserControllerIntegrationTest {
 
+    private static final String USERS_PATH = "/api/v1/users";
+
     @Autowired
     private UserRepository userRepository;
 
@@ -41,13 +43,13 @@ class UserControllerIntegrationTest {
                 }
                 """;
 
-        var response = sendRequest("/users", "POST", payload);
+        var response = sendRequest(USERS_PATH, "POST", payload);
         var body = readBody(response);
 
         var createdId = body.get("id").asLong();
 
         assertEquals(201, response.statusCode());
-        assertEquals("/users/%s".formatted(createdId), response.headers().firstValue("Location").orElseThrow());
+        assertEquals("%s/%s".formatted(USERS_PATH, createdId), response.headers().firstValue("Location").orElseThrow());
         assertEquals(createdId, body.get("id").asLong());
         assertEquals("Maria", body.get("name").asText());
         assertEquals("COMMON", body.get("type").asText());
@@ -67,7 +69,7 @@ class UserControllerIntegrationTest {
                 }
                 """;
 
-        sendRequest("/users", "POST", payload);
+        sendRequest(USERS_PATH, "POST", payload);
 
         var duplicateEmailPayload = """
                 {
@@ -79,14 +81,14 @@ class UserControllerIntegrationTest {
                 }
                 """;
 
-        var response = sendRequest("/users", "POST", duplicateEmailPayload);
+        var response = sendRequest(USERS_PATH, "POST", duplicateEmailPayload);
         var body = readBody(response);
 
         assertEquals(409, response.statusCode());
         assertEquals(409, body.get("status").asInt());
         assertEquals("Conflict", body.get("error").asText());
         assertEquals("Email already registered", body.get("message").asText());
-        assertEquals("/users", body.get("path").asText());
+        assertEquals(USERS_PATH, body.get("path").asText());
     }
 
     @Test
@@ -103,10 +105,10 @@ class UserControllerIntegrationTest {
                 }
                 """;
 
-        var createResponse = sendRequest("/users", "POST", payload);
+        var createResponse = sendRequest(USERS_PATH, "POST", payload);
         var createdId = readBody(createResponse).get("id").asLong();
 
-        var response = sendRequest("/users/%s".formatted(createdId), "GET", null);
+        var response = sendRequest("%s/%s".formatted(USERS_PATH, createdId), "GET", null);
         var body = readBody(response);
 
         assertEquals(200, response.statusCode());
@@ -119,14 +121,14 @@ class UserControllerIntegrationTest {
     void shouldReturnNotFoundWhenUserDoesNotExist() throws Exception {
         userRepository.deleteAll();
 
-        var response = sendRequest("/users/99", "GET", null);
+        var response = sendRequest("%s/99".formatted(USERS_PATH), "GET", null);
         var body = readBody(response);
 
         assertEquals(404, response.statusCode());
         assertEquals(404, body.get("status").asInt());
         assertEquals("Not Found", body.get("error").asText());
         assertEquals("User with id 99 not found", body.get("message").asText());
-        assertEquals("/users/99", body.get("path").asText());
+        assertEquals("%s/99".formatted(USERS_PATH), body.get("path").asText());
     }
 
     private HttpResponse<String> sendRequest(String path, String method, String payload) throws Exception {

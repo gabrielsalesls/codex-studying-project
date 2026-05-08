@@ -1,6 +1,7 @@
 # CURLs de teste
 
 Os exemplos desta pasta assumem que a aplicacao esta rodando em `http://localhost:8080`.
+Todas as rotas usam o prefixo `/api/v1`.
 
 Arquivos:
 

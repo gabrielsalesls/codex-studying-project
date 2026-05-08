@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/v1/users")
 public class UserController {
 
     private final UserService userService;
@@ -24,7 +24,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserResponse> create(@Valid @RequestBody UserRequest request) {
         var response = userService.create(request);
-        return ResponseEntity.created(URI.create("/users/%s".formatted(response.id()))).body(response);
+        return ResponseEntity.created(URI.create("/api/v1/users/%s".formatted(response.id()))).body(response);
     }
 
     @GetMapping("/{id}")

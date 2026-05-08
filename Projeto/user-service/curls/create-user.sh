@@ -3,7 +3,7 @@
 BASE_URL="${BASE_URL:-http://localhost:8080}"
 
 curl --request POST \
-  --url "${BASE_URL}/users" \
+  --url "${BASE_URL}/api/v1/users" \
   --header "Content-Type: application/json" \
   --data '{
     "name": "Maria Silva",
