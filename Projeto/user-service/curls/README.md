@@ -7,5 +7,6 @@ Arquivos:
 
 - `create-user.sh`: cria um usuario.
 - `get-user-by-id.sh`: busca um usuario por id.
+- `get-user-error.sh`: busca um usuario inexistente para validar o retorno `404`.
 
 Se quiser alterar a porta, ajuste a variavel `BASE_URL` em cada arquivo.
