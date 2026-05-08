@@ -1,8 +1,10 @@
 package dev.gabrielsales.wallet_service.wallet;
 
 import dev.gabrielsales.wallet_service.common.exception.ResourceConflictException;
+import dev.gabrielsales.wallet_service.common.exception.ResourceNotFoundException;
 import dev.gabrielsales.wallet_service.wallet.api.CreateWalletRequest;
 import dev.gabrielsales.wallet_service.wallet.api.WalletCreatedResponse;
+import dev.gabrielsales.wallet_service.wallet.api.WalletResponse;
 import java.math.BigDecimal;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -40,5 +42,15 @@ public class WalletService {
                 savedWallet.getUserId(),
                 savedWallet.getBalance()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public WalletResponse findByUserId(Long userId) {
+        var wallet = walletRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Wallet not found for user with id %s".formatted(userId)
+                ));
+
+        return new WalletResponse(wallet.getUserId(), wallet.getBalance());
     }
 }

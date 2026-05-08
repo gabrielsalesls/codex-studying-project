@@ -4,6 +4,8 @@ import dev.gabrielsales.wallet_service.wallet.WalletService;
 import jakarta.validation.Valid;
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,5 +25,10 @@ public class WalletController {
     public ResponseEntity<WalletCreatedResponse> create(@Valid @RequestBody CreateWalletRequest request) {
         var response = walletService.create(request);
         return ResponseEntity.created(URI.create("/wallet/%s".formatted(response.userId()))).body(response);
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<WalletResponse> findByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(walletService.findByUserId(userId));
     }
 }

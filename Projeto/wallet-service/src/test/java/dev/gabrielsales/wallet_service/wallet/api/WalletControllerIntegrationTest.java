@@ -74,11 +74,56 @@ class WalletControllerIntegrationTest {
         assertEquals(WALLET_PATH, body.get("path").asText());
     }
 
+    @Test
+    void shouldReturnBalanceByUserId() throws Exception {
+        walletRepository.deleteAll();
+
+        var payload = """
+                {
+                  "userId": 1,
+                  "userType": "COMMON"
+                }
+                """;
+
+        sendPost(payload);
+
+        var response = sendGet(1);
+        var body = readBody(response);
+
+        assertEquals(200, response.statusCode());
+        assertEquals(1L, body.get("userId").asLong());
+        assertEquals(0, body.get("balance").decimalValue().signum());
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenWalletDoesNotExist() throws Exception {
+        walletRepository.deleteAll();
+
+        var response = sendGet(99);
+        var body = readBody(response);
+
+        assertEquals(404, response.statusCode());
+        assertEquals(404, body.get("status").asInt());
+        assertEquals("Not Found", body.get("error").asText());
+        assertEquals("Wallet not found for user with id 99", body.get("message").asText());
+        assertEquals("%s/99".formatted(WALLET_PATH), body.get("path").asText());
+    }
+
     private HttpResponse<String> sendPost(String payload) throws Exception {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:%s%s".formatted(port, WALLET_PATH)))
                 .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 .POST(HttpRequest.BodyPublishers.ofString(payload))
+                .build();
+
+        return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private HttpResponse<String> sendGet(long userId) throws Exception {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:%s%s/%s".formatted(port, WALLET_PATH, userId)))
+                .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .GET()
                 .build();
 
         return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
